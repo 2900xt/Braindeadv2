@@ -8,7 +8,6 @@ Library: /home/taha/Braindeadv2/Temp/BurstOutput/Data/Plugins/lib_burst_generate
 --float-precision=Standard
 --generate-link-xml=Temp/burst.link.xml
 --temp-folder=/home/taha/Braindeadv2/Temp/Burst
---debug=Full
 --key-folder=/home/taha/Unity/Hub/Editor/2022.3.0f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport
 --decode-folder=/home/taha/Braindeadv2/Library/Burst
 --output=/home/taha/Braindeadv2/Temp/BurstOutput/Data/Plugins/lib_burst_generated
@@ -116,7 +115,6 @@ Library: /home/taha/Braindeadv2/Temp/BurstOutput/Data/Plugins/lib_burst_generate
 --float-precision=Standard
 --generate-link-xml=Temp/burst.link.xml
 --temp-folder=/home/taha/Braindeadv2/Temp/Burst
---debug=Full
 --key-folder=/home/taha/Unity/Hub/Editor/2022.3.0f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport
 --decode-folder=/home/taha/Braindeadv2/Library/Burst
 --output=/home/taha/Braindeadv2/Temp/BurstOutput/Data/Plugins/lib_burst_generated

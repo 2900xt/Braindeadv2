@@ -8,7 +8,7 @@ public class ServerManager : MonoBehaviour
     public GameObject debugConsole;
     public bool consoleActive = false;
 
-    public void Awake()
+    public void Start()
     {
         string connection = PlayerPrefs.GetString("Connection");
         if(connection == "Host")
@@ -21,16 +21,9 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    static void StatusLabels()
-    {
-        var mode = NetworkManager.Singleton.IsHost ? "Host" : (NetworkManager.Singleton.IsServer ? "Server" : "Client");
-        GUILayout.Label("Transport: " + NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name);
-        GUILayout.Label("Mode: " + mode);
-    }
-
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.BackQuote) && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost))
+        if(Input.GetKeyDown(KeyCode.BackQuote))
         {
             debugConsole.SetActive(!consoleActive);
             consoleActive = !consoleActive;

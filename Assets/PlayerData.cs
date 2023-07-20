@@ -8,11 +8,14 @@ using Cinemachine;
 
 public class PlayerData : NetworkBehaviour
 {
-    public static float movementMultiplier = 5f;
+    public static float movementMultiplier = 25f;
 
-    private Vector2 velocity;
+    public Rigidbody2D rb;
 
-    public Transform sprite;
+    /* True if player is on T side */
+    public NetworkVariable<bool> team;
+    public SpriteRenderer spriteRenderer;
+    public Sprite tSprite, ctSprite;
     
     public TextMeshPro playerUsernameField;
     public NetworkVariable<FixedString32Bytes> username;
@@ -20,8 +23,17 @@ public class PlayerData : NetworkBehaviour
     public CinemachineVirtualCamera playerCamera;
     public AudioListener audioListener;
 
+    public NetworkVariable<float> hp;
+    public NetworkVariable<int> money;
+    public NetworkVariable<int> kills;
+
+    private bool isInitialized;
+
     public override void OnNetworkSpawn()
     {
+        username.OnValueChanged += OnUsernameChanged;
+        team.OnValueChanged += OnTeamChanged;
+
         if(!IsOwner)
         {
             playerCamera.Priority = 0;
@@ -29,27 +41,29 @@ public class PlayerData : NetworkBehaviour
             return;
         }
 
+        RequestTeamSwitchServerRpc(Random.Range(0f, 1f) > 0.5f);
+
         playerUsernameField.text = PlayerPrefs.GetString("Username");
         RequestUsernameChangeServerRpc(playerUsernameField.text);
 
         audioListener.enabled = true;
         playerCamera.Priority = 1;
+        isInitialized = false;
+    }
+
+    public void OnUsernameChanged(FixedString32Bytes oldUsername, FixedString32Bytes newUsername)
+    {
+        playerUsernameField.text = newUsername.ToString();
+    }
+    
+    public void OnTeamChanged(bool oldTeam, bool newTeam)
+    {
+        spriteRenderer.sprite = newTeam ? tSprite : ctSprite;
     }
 
     public void Rotate(float angle)
     {
-        sprite.rotation = Quaternion.Euler(0f, 0f, angle);
-    }
-
-    public void Move(Vector2 velocity)
-    {
-        transform.position += new Vector3(velocity.x, velocity.y, 0f);
-    }
-
-    [ServerRpc]
-    public void RequestUsernameChangeServerRpc(string newUsername, ServerRpcParams rpcParams = default)
-    {
-        username.Value = new FixedString32Bytes(newUsername);
+        spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
     void UpdatePosition()
@@ -59,10 +73,7 @@ public class PlayerData : NetworkBehaviour
             Input.GetAxisRaw("Vertical")
         );
         inputAcceleration *= movementMultiplier * Time.deltaTime;
-        velocity += inputAcceleration;
-        velocity *= 0.6f;
-
-        Move(velocity);
+        rb.velocity += inputAcceleration;
     }
 
     void UpdateRotation()
@@ -81,12 +92,29 @@ public class PlayerData : NetworkBehaviour
 
     void Update()
     {
-        playerUsernameField.text = username.Value.ToString();
-
-
+        if(!isInitialized)
+        {
+            playerUsernameField.text = username.Value.ToString();
+            spriteRenderer.sprite = team.Value ? tSprite : ctSprite;
+            isInitialized = true;
+        }
+        /* Player Movement and Input */
         if(!IsOwner) return;
 
         UpdateRotation();
         UpdatePosition();
+    }
+
+
+    [ServerRpc]
+    public void RequestUsernameChangeServerRpc(string newUsername, ServerRpcParams rpcParams = default)
+    {
+        username.Value = new FixedString32Bytes(newUsername);
+    }
+
+    [ServerRpc]
+    public void RequestTeamSwitchServerRpc(bool newTeam, ServerRpcParams rpcParams = default)
+    {
+        team.Value = newTeam;
     }
 }
