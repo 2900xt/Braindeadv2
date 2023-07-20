@@ -2,68 +2,71 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using TMPro;
 
 public class PlayerData : NetworkBehaviour
 {
     public static float movementMultiplier = 1f;
 
-    private NetworkVariable<Vector2> velocity = new NetworkVariable<Vector2>();
-    private NetworkVariable<float> rotation = new NetworkVariable<float>();
-    private Transform playerCamera;
+    private Vector2 velocity;
+    public Transform playerCamera;
+    public Transform spriteRotation;
+    public TextMeshPro playerUsernameField;
 
     public override void OnNetworkSpawn()
     {
-        playerCamera = transform.Find("PlayerCamera");
-    }
+        if(IsOwner)
+        {
+            playerUsernameField.text = PlayerPrefs.GetString("Username");
+        }
 
-    public void Accelerate(Vector2 delta)
-    {
-        if(NetworkManager.Singleton.IsServer)
-        {
-            velocity.Value += delta;
-        }
-        else 
-        {
-            SubmitAccelerateRequestServerRpc(delta);
-        }
+        playerCamera = transform.Find("PlayerCamera");
+        spriteRotation = transform.Find("T_Player");
     }
 
     public void Rotate(float angle)
     {
-        if(NetworkManager.Singleton.IsServer)
-        {
-            rotation.Value = angle;
-        }
-        else 
+        if(!NetworkManager.Singleton.IsServer)
         {
             SubmitRotateRequestServerRpc(angle);
+        } else {
+            spriteRotation.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
+    }
+
+    public void Move(Vector2 velocity)
+    {
+        if(!NetworkManager.Singleton.IsServer)
+        {
+            SubmitMoveRequestServerRpc(velocity);
+        } else {
+            transform.position += new Vector3(velocity.x, velocity.y, 0f);
         }
     }
 
     [ServerRpc]
-    void SubmitAccelerateRequestServerRpc(Vector2 delta, ServerRpcParams rpcParams = default)
+    void SubmitMoveRequestServerRpc(Vector2 velocity)
     {
-        velocity.Value += delta;
+        transform.position += new Vector3(velocity.x, velocity.y, 0f);
     }
 
     [ServerRpc]
     void SubmitRotateRequestServerRpc(float degrees)
     {
-        rotation.Value = degrees;
+        spriteRotation.rotation = Quaternion.Euler(0f, 0f, degrees);
     }
 
-    void UpdateAcceleration()
+    void UpdatePosition()
     {
         Vector2 inputAcceleration = new Vector2(
             Input.GetAxisRaw("Horizontal"),
             Input.GetAxisRaw("Vertical")
-            
         );
         inputAcceleration *= movementMultiplier * Time.deltaTime;
-        Accelerate(inputAcceleration);
-        
-        transform.position += new Vector3(velocity.Value.x, velocity.Value.y, 0f);
-        velocity.Value *= 0.6f;
+        velocity += inputAcceleration;
+        velocity *= 0.6f;
+
+        Move(velocity);
     }
 
     void UpdateRotation()
@@ -78,13 +81,13 @@ public class PlayerData : NetworkBehaviour
         }
 
         Rotate(angle);
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-        playerCamera.rotation = Quaternion.identity;
     }
 
     void Update()
     {
+        if(!IsOwner) return;
+
         UpdateRotation();
-        UpdateAcceleration();
+        UpdatePosition();
     }
 }
