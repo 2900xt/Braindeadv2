@@ -1,59 +1,55 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 using Unity.Netcode;
 using TMPro;
+using Cinemachine;
 
 public class PlayerData : NetworkBehaviour
 {
-    public static float movementMultiplier = 1f;
+    public static float movementMultiplier = 5f;
 
     private Vector2 velocity;
-    public Transform playerCamera;
-    public Transform spriteRotation;
+
+    public Transform sprite;
+    
     public TextMeshPro playerUsernameField;
+    public NetworkVariable<FixedString32Bytes> username;
+    
+    public CinemachineVirtualCamera playerCamera;
+    public AudioListener audioListener;
 
     public override void OnNetworkSpawn()
     {
-        if(IsOwner)
+        if(!IsOwner)
         {
-            playerUsernameField.text = PlayerPrefs.GetString("Username");
+            playerCamera.Priority = 0;
+            audioListener.enabled = false;
+            return;
         }
 
-        playerCamera = transform.Find("PlayerCamera");
-        spriteRotation = transform.Find("T_Player");
+        playerUsernameField.text = PlayerPrefs.GetString("Username");
+        RequestUsernameChangeServerRpc(playerUsernameField.text);
+
+        audioListener.enabled = true;
+        playerCamera.Priority = 1;
     }
 
     public void Rotate(float angle)
     {
-        if(!NetworkManager.Singleton.IsServer)
-        {
-            SubmitRotateRequestServerRpc(angle);
-        } else {
-            spriteRotation.rotation = Quaternion.Euler(0f, 0f, angle);
-        }
+        sprite.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
     public void Move(Vector2 velocity)
-    {
-        if(!NetworkManager.Singleton.IsServer)
-        {
-            SubmitMoveRequestServerRpc(velocity);
-        } else {
-            transform.position += new Vector3(velocity.x, velocity.y, 0f);
-        }
-    }
-
-    [ServerRpc]
-    void SubmitMoveRequestServerRpc(Vector2 velocity)
     {
         transform.position += new Vector3(velocity.x, velocity.y, 0f);
     }
 
     [ServerRpc]
-    void SubmitRotateRequestServerRpc(float degrees)
+    public void RequestUsernameChangeServerRpc(string newUsername, ServerRpcParams rpcParams = default)
     {
-        spriteRotation.rotation = Quaternion.Euler(0f, 0f, degrees);
+        username.Value = new FixedString32Bytes(newUsername);
     }
 
     void UpdatePosition()
@@ -85,6 +81,9 @@ public class PlayerData : NetworkBehaviour
 
     void Update()
     {
+        playerUsernameField.text = username.Value.ToString();
+
+
         if(!IsOwner) return;
 
         UpdateRotation();

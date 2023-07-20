@@ -422,6 +422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 1007588836063824252}
+  spriteRotation: {fileID: 0}
   playerUsernameField: {fileID: 1643122019312325352}
 --- !u!114 &498613993279972558
 MonoBehaviour:
@@ -437,7 +438,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SyncPositionX: 1
   SyncPositionY: 1
-  SyncPositionZ: 0
+  SyncPositionZ: 1
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1

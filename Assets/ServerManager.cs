@@ -6,6 +6,8 @@ using Unity.Netcode;
 public class ServerManager : MonoBehaviour
 {
     public GameObject debugConsole;
+    public bool consoleActive = false;
+
     public void Awake()
     {
         string connection = PlayerPrefs.GetString("Connection");
@@ -28,9 +30,10 @@ public class ServerManager : MonoBehaviour
 
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Tilde))
+        if(Input.GetKeyDown(KeyCode.BackQuote) && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost))
         {
-            debugConsole.SetActive(!debugConsole.activeInHierarchy);
+            debugConsole.SetActive(!consoleActive);
+            consoleActive = !consoleActive;
         }
     }
 }
