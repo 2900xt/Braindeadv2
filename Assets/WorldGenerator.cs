@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,61 +7,85 @@ using Unity.Netcode;
 
 public class WorldGenerator : NetworkBehaviour
 {
-    public GameObject GroundPrefab, WallPrefab;
 
-    public static float worldWidth = 500, worldLength = 500;
+    public List<GameObject> prefabList;
+
+    public static int worldWidth = 48, worldLength = 48;
+
+    public static readonly string mapFilePath = "/home/taha/Braindead-2DS/res/maps/braindead-default.map";
+
+    public static NetworkVariable<bool> worldGenerated = new NetworkVariable<bool>(false);
+
+    public static bool clientPlayerSpawned = false;
+    public GameObject playerPrefab;
+    public PlayerData clientPlayer;
+
+    public NetworkVariable<Vector3> TSpawn = new NetworkVariable<Vector3>(), CTSpawn = new NetworkVariable<Vector3>();
+    public NetworkVariable<Vector3> ASite = new NetworkVariable<Vector3>(), BSite = new NetworkVariable<Vector3>(); 
     
     public override void OnNetworkSpawn()
     {
         /* Only spawn the world if server */
-        if(!(NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost))
+        if(!NetworkManager.Singleton.IsServer && !worldGenerated.Value)
         {
             return;
         }
 
-        float worldStartX = -(worldWidth / 2), worldEndX = worldWidth / 2;
-        float worldStartY = -(worldLength / 2), worldEndY = worldLength / 2;
-        float x = 0, y = 0;
-
-        /* Spawn ground */
-        for(x = worldStartX; x < worldEndX; x += 10)
+        string[] rows = File.ReadAllLines(mapFilePath);
+        for(int r = 0; r < rows.Length; r++)
         {
-            for(y = worldStartY; y < worldEndY; y += 10)
+            string row = rows[(rows.Length - 1) - r].Replace("\n", "");
+            string[] segments = row.Split(' ');
+            for(int c = 0; c < segments.Length; c++)
             {
-                SpawnObject(GroundPrefab, x, y);
+                char code = segments[c][0];
+                SpawnSegment(code, r, c);
             }
         }
 
-        /* Spawn Walls */
-        x = worldStartX;
-        for(y = worldStartY + 10; y < worldEndY; y += 10)
-        {
-            SpawnObject(WallPrefab, x, y);
-        }
+        worldGenerated.Value = true;
+    }
 
-        x = worldEndX - 10;
-        for(y = worldStartY + 10; y < worldEndY; y += 10)
+    private void SpawnSegment(char segmentCode, int r, int c)
+    {
+        float x = ((c / 48f) * 500f) - 250, y = ((r / 48f) * 500f) - 250;
+        switch(segmentCode)
         {
-            SpawnObject(WallPrefab, x, y);
-        }
-
-        y = worldStartY;
-        for(x = worldStartX; x < worldEndX; x += 10)
-        {
-            SpawnObject(WallPrefab, x, y);
-        }
-
-        y = worldEndY;
-        for(x = worldStartX; x < worldEndX; x += 10)
-        {
-            SpawnObject(WallPrefab, x, y);
+            case 't':
+                TSpawn.Value = new Vector3(x, y, 0);
+                break;
+            case 'c':
+                CTSpawn.Value = new Vector3(x, y, 0);
+                break;
+            case 'a':
+                ASite.Value = new Vector3(x, y, 0);
+                break;
+            case 'b':
+                BSite.Value = new Vector3(x, y, 0);
+                break;
+            case '0':
+                return;
+            default:
+                int index = (int)(segmentCode - '0');
+                SpawnObject(prefabList[index], x, y);
+                break;
         }
     }
 
-    private void SpawnObject(GameObject obj, float x, float y)
+    private GameObject SpawnObject(GameObject obj, float x, float y)
     {
-        GameObject newObj = Instantiate(obj, new Vector3(x, y, 1f), Quaternion.identity);
+        GameObject newObj = Instantiate(obj, new Vector3(x, y, 0f), Quaternion.identity);
         newObj.GetComponent<NetworkObject>().Spawn();
         newObj.transform.parent = transform;
+        return newObj;
+    }
+
+    public void Update()
+    {
+        if(worldGenerated.Value && !clientPlayerSpawned)
+        {
+            clientPlayer = SpawnObject(playerPrefab, -1000, -1000).GetComponent<PlayerData>();
+            clientPlayerSpawned = true;
+        }
     }
 }

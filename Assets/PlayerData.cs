@@ -10,13 +10,16 @@ public class PlayerData : NetworkBehaviour
 {
     public static float movementMultiplier = 25f;
 
+    public static PlayerData currentClientPlayer;
+
     public Rigidbody2D rb;
 
     /* True if player is on T side */
     public NetworkVariable<bool> team;
     public SpriteRenderer spriteRenderer;
     public Sprite tSprite, ctSprite;
-    
+    public GameObject lightCaster;
+
     public TextMeshPro playerUsernameField;
     public NetworkVariable<FixedString32Bytes> username;
     
@@ -31,6 +34,7 @@ public class PlayerData : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        isInitialized = false;
         username.OnValueChanged += OnUsernameChanged;
         team.OnValueChanged += OnTeamChanged;
 
@@ -48,7 +52,7 @@ public class PlayerData : NetworkBehaviour
 
         audioListener.enabled = true;
         playerCamera.Priority = 1;
-        isInitialized = false;
+        currentClientPlayer = this;
     }
 
     public void OnUsernameChanged(FixedString32Bytes oldUsername, FixedString32Bytes newUsername)
@@ -92,6 +96,8 @@ public class PlayerData : NetworkBehaviour
 
     void Update()
     {
+        lightCaster.SetActive(team.Value == currentClientPlayer.team.Value);
+
         if(!isInitialized)
         {
             playerUsernameField.text = username.Value.ToString();
@@ -115,6 +121,9 @@ public class PlayerData : NetworkBehaviour
     [ServerRpc]
     public void RequestTeamSwitchServerRpc(bool newTeam, ServerRpcParams rpcParams = default)
     {
+        transform.position = newTeam ? 
+            GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().TSpawn.Value : 
+            GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().CTSpawn.Value;
         team.Value = newTeam;
     }
 }
