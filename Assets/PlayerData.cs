@@ -6,12 +6,10 @@ using Unity.Netcode;
 using TMPro;
 using Cinemachine;
 
-public class PlayerData : NetworkBehaviour
+public class PlayerData : NetworkBehaviour, INetworkSerializable
 {
     public static float movementMultiplier = 25f;
-
     public static PlayerData currentClientPlayer;
-
     public Rigidbody2D rb;
 
     /* True if player is on T side */
