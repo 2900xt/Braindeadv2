@@ -349,12 +349,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  _SortingLayer: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 2113283830567491016}
   m_maskType: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
 --- !u!1 &4610999217927088199
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,7 +565,6 @@ Transform:
   - {fileID: 3168998300736385343}
   - {fileID: 4925890915649930574}
   - {fileID: 7084274479438106134}
-  - {fileID: 8895126821432064786}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -632,6 +631,7 @@ MonoBehaviour:
     m_InternalValue: 0
   kills:
     m_InternalValue: 0
+  weapon: {fileID: 2243878522686760760}
 --- !u!114 &8728389104221106908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -666,10 +666,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SyncPositionX: 1
   SyncPositionY: 1
-  SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
@@ -787,6 +787,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8749986915686801541}
+  - {fileID: 8895126821432064786}
   m_Father: {fileID: 5613373909267027024}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1109,13 +1110,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7591863022650031630}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1882606859551812978}
-  m_Father: {fileID: 5613373909267027024}
+  m_Father: {fileID: 3168998300736385343}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6559548374897471385
@@ -1136,7 +1137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4695124145947378411, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 6.38
       objectReference: {fileID: 0}
     - target: {fileID: 4695124145947378411, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1170,6 +1171,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -45
       objectReference: {fileID: 0}
+    - target: {fileID: 4912276960469469345, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
+      propertyPath: holder
+      value: 
+      objectReference: {fileID: 237888116187179946}
     - target: {fileID: 8264033352486348684, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
       propertyPath: m_Name
       value: AK-47
@@ -1184,3 +1189,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4695124145947378411, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
   m_PrefabInstance: {fileID: 6559548374897471385}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2243878522686760760 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4912276960469469345, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
+  m_PrefabInstance: {fileID: 6559548374897471385}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4532a54741deb5c56bfa5f19bf3886fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

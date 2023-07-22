@@ -8,21 +8,28 @@ public class BulletData : NetworkBehaviour
     public Vector3 velocity;
     public NetworkVariable<int> damage;
     public NetworkVariable<bool> team;
-    public PlayerData shooter;
+
+    public override void OnNetworkSpawn()
+    {
+        velocity = new Vector3(0, 0, 0);
+    }
 
     void Update()
     {
-        transform.position += velocity * Time.deltaTime;
+        if(IsOwner)
+        {
+            transform.position += velocity * Time.deltaTime;
+        }
     }
 
     [ServerRpc]
-    public void SetDamageServerRpc(int dmg, ServerRpcParams srpcParams = default)
+    public void SetDamageServerRpc(int dmg, ServerRpcParams sRpcParams = default)
     {
         damage.Value = dmg;
     }
     
     [ServerRpc]
-    public void SetTeamServerRpc(bool newTeam, ServerRpcParams params = default)
+    public void SetTeamServerRpc(bool newTeam, ServerRpcParams sRpcParams = default)
     {
         team.Value = newTeam;
     }

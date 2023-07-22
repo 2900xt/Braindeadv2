@@ -20,6 +20,10 @@ public class WeaponData : NetworkBehaviour
     public bool shooting = false;
     public bool reloading = false;
     public float shootTimer = 0, reloadTimer = 0;
+
+    public GameObject bulletPrefab;
+    public PlayerData holder;
+    public Transform shootpoint;
     
     public void Reload()
     {
@@ -63,9 +67,19 @@ public class WeaponData : NetworkBehaviour
         shootTimer = fireRate;
         bulletsInMag--;
 
-
+        SpawnBullet();
 
         shooting = true;
+    }
+
+    private void SpawnBullet()
+    {
+        BulletData bullet = Instantiate(bulletPrefab, shootpoint.position, shootpoint.rotation).GetComponent<BulletData>();
+        bullet.GetComponent<NetworkObject>().Spawn();
+        bullet.SetDamageServerRpc(bulletDamage);
+        bullet.SetTeamServerRpc(holder.team.Value);
+        bullet.velocity = bullet.transform.right * 100f;
+        bullet.transform.rotation = Quaternion.Euler(0, 0, bullet.transform.rotation.eulerAngles.z + Random.Range(-(currentRecoil / 2), currentRecoil / 2) + 90f);
     }
 
     public void Update()
@@ -94,10 +108,5 @@ public class WeaponData : NetworkBehaviour
                 DoneReload();
             }
         }
-    }
-
-    void OnTriggerEnter()
-    {
-        print("Trigger Entered");
     }
 }

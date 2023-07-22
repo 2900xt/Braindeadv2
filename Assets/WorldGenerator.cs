@@ -21,7 +21,9 @@ public class WorldGenerator : NetworkBehaviour
     public PlayerData clientPlayer;
 
     public NetworkVariable<Vector3> TSpawn = new NetworkVariable<Vector3>(), CTSpawn = new NetworkVariable<Vector3>();
-    public NetworkVariable<Vector3> ASite = new NetworkVariable<Vector3>(), BSite = new NetworkVariable<Vector3>(); 
+    public NetworkVariable<Vector3> ASite = new NetworkVariable<Vector3>(), BSite = new NetworkVariable<Vector3>();
+
+    public List<PlayerData> serverPlayerList;
     
     public override void OnNetworkSpawn()
     {
@@ -77,6 +79,7 @@ public class WorldGenerator : NetworkBehaviour
         GameObject newObj = Instantiate(obj, new Vector3(x, y, 0f), Quaternion.identity);
         newObj.GetComponent<NetworkObject>().Spawn();
         newObj.transform.parent = transform;
+        newObj.transform.rotation = Quaternion.identity;
         return newObj;
     }
 

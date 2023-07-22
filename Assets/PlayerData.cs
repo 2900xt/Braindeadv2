@@ -6,7 +6,7 @@ using Unity.Netcode;
 using TMPro;
 using Cinemachine;
 
-public class PlayerData : NetworkBehaviour, INetworkSerializable
+public class PlayerData : NetworkBehaviour
 {
     public static float movementMultiplier = 25f;
     public static PlayerData currentClientPlayer;
@@ -27,6 +27,8 @@ public class PlayerData : NetworkBehaviour, INetworkSerializable
     public NetworkVariable<float> hp;
     public NetworkVariable<int> money;
     public NetworkVariable<int> kills;
+
+    public WeaponData weapon;
 
     private bool isInitialized;
 
@@ -107,6 +109,11 @@ public class PlayerData : NetworkBehaviour, INetworkSerializable
 
         UpdateRotation();
         UpdatePosition();
+
+        if(Input.GetMouseButton(0))
+        {
+            weapon.Shoot(rb.velocity.magnitude);
+        }
     }
 
 
@@ -123,5 +130,24 @@ public class PlayerData : NetworkBehaviour, INetworkSerializable
             GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().TSpawn.Value : 
             GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().CTSpawn.Value;
         team.Value = newTeam;
+    }
+
+    [ServerRpc]
+    public void TakeDamageServerRpc(int dmg, ServerRpcParams rpcParams = default)
+    {
+        hp.Value -= dmg;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if(!collider.gameObject.CompareTag("Bullet")) return;
+
+        BulletData data = collider.gameObject.GetComponent<BulletData>();
+        if(data.team.Value != this.team.Value)
+        {
+            TakeDamageServerRpc(data.damage.Value);
+        }
+
+        collider.gameObject.GetComponent<NetworkObject>().Despawn(true);
     }
 }
