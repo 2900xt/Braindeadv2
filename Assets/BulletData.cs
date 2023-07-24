@@ -8,6 +8,7 @@ public class BulletData : NetworkBehaviour
     public Vector3 velocity;
     public NetworkVariable<int> damage;
     public NetworkVariable<bool> team;
+    public float timer = 2f;
 
     public override void OnNetworkSpawn()
     {
@@ -19,6 +20,11 @@ public class BulletData : NetworkBehaviour
         if(IsOwner)
         {
             transform.position += velocity * Time.deltaTime;
+            timer -= Time.deltaTime;
+            if(timer < 0)
+            {
+                GetComponent<NetworkObject>().Despawn(true);
+            }
         }
     }
 

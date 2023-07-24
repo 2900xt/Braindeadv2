@@ -12,12 +12,10 @@ public class WorldGenerator : NetworkBehaviour
 
     public static int worldWidth = 48, worldLength = 48;
 
-    public static readonly string mapFilePath = "/home/taha/Braindead-2DS/res/maps/braindead-default.map";
+    public static readonly string mapFilePath = "C:\\Users\\1038493\\Documents\\Code\\AET\\2022-2023\\Braindead-2DS\\res\\maps\\braindead-default.map";
 
     public static NetworkVariable<bool> worldGenerated = new NetworkVariable<bool>(false);
 
-    public static bool clientPlayerSpawned = false;
-    public GameObject playerPrefab;
     public PlayerData clientPlayer;
 
     public NetworkVariable<Vector3> TSpawn = new NetworkVariable<Vector3>(), CTSpawn = new NetworkVariable<Vector3>();
@@ -83,12 +81,4 @@ public class WorldGenerator : NetworkBehaviour
         return newObj;
     }
 
-    public void Update()
-    {
-        if(worldGenerated.Value && !clientPlayerSpawned)
-        {
-            clientPlayer = SpawnObject(playerPrefab, -1000, -1000).GetComponent<PlayerData>();
-            clientPlayerSpawned = true;
-        }
-    }
 }

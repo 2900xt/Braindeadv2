@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class ServerManager : MonoBehaviour
+public class ServerManager : NetworkManager
 {
     public GameObject debugConsole;
+    public GameObject worldGenerator;
     public bool consoleActive = false;
 
     public void Start()
@@ -19,6 +20,12 @@ public class ServerManager : MonoBehaviour
         {
             NetworkManager.Singleton.StartClient();
         }
+    }
+
+    public override void OnServerAddPlayer(NetworkConnection con, short playerID)
+    {
+        GameObject player = Instantiate(playerPrefab, new Vector3(-1000, -1000, 0), Quaternion.identity);
+        NetworkServer.AddPlayerForConnection(conm, player, playerID);
     }
 
     public void Update()
