@@ -12,7 +12,7 @@ public class WorldGenerator : NetworkBehaviour
 
     public static int worldWidth = 48, worldLength = 48;
 
-    public static readonly string mapFilePath = "C:\\Users\\1038493\\Documents\\Code\\AET\\2022-2023\\Braindead-2DS\\res\\maps\\braindead-default.map";
+    public static readonly string mapFilePath = "/home/taha/Downloads/braindead-default.map";
 
     public static NetworkVariable<bool> worldGenerated = new NetworkVariable<bool>(false);
 
@@ -26,7 +26,7 @@ public class WorldGenerator : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         /* Only spawn the world if server */
-        if(!NetworkManager.Singleton.IsServer && !worldGenerated.Value)
+        if(!NetworkManager.Singleton.IsServer || worldGenerated.Value)
         {
             return;
         }

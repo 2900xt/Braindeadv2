@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4695124145947378411}
   - component: {fileID: 6378155066631880151}
-  - component: {fileID: 4912276960469469345}
+  - component: {fileID: -7596573643949845664}
   m_Layer: 0
   m_Name: AK-47
   m_TagString: Untagged
@@ -86,7 +86,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4912276960469469345
+--- !u!114 &-7596573643949845664
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletDamage: 40
-  recoilRate: 0
+  recoilRate: 0.2
   currentRecoil: 0
   reloadTime: 4
   fireRate: 0.2
@@ -107,12 +107,14 @@ MonoBehaviour:
   bulletsInMag: 25
   magSize: 25
   shooting: 0
-  reloading: 1
+  reloading: 0
   shootTimer: 0
   reloadTimer: 0
-  bulletPrefab: {fileID: 7616466277973338328, guid: 5e73ae7c85608704ab89d3961fdc12e1, type: 3}
-  holder: {fileID: 0}
+  bulletPrefab: {fileID: 3279414118249024239, guid: 5e73ae7c85608704ab89d3961fdc12e1, type: 3}
   shootpoint: {fileID: 7763342990524188866}
+  holder: {fileID: 0}
+  gunImage: {fileID: 21300000, guid: aead096d89b9591418cb3b1b9156f75f, type: 3}
+  spriteRotation: 45
 --- !u!1 &8651269816785096100
 GameObject:
   m_ObjectHideFlags: 0

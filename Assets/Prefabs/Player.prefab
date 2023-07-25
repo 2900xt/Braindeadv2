@@ -558,7 +558,7 @@ Transform:
   m_GameObject: {fileID: 4640132214010100295}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9116226093522630133}
@@ -581,8 +581,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 8562861414789557577}
-  team:
-    m_InternalValue: 0
   spriteRenderer: {fileID: 8599250012254409689}
   tSprite: {fileID: 21300000, guid: 102b37f2e387dfc85b90deca6f6f4ce6, type: 3}
   ctSprite: {fileID: 21300000, guid: f0305b55f9c570804b6dc9cdb4dd9514, type: 3}
@@ -625,13 +623,7 @@ MonoBehaviour:
         byte0029: 0
   playerCamera: {fileID: 3267332735084309819}
   audioListener: {fileID: 1700717009271096490}
-  hp:
-    m_InternalValue: 0
-  money:
-    m_InternalValue: 0
-  kills:
-    m_InternalValue: 0
-  weapon: {fileID: 2243878522686760760}
+  weapon: {fileID: 5592273346995125497}
 --- !u!114 &8728389104221106908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,7 +720,7 @@ Rigidbody2D:
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 1
+  m_UseAutoMass: 0
   m_Mass: 91.60885
   m_LinearDrag: 1.5
   m_AngularDrag: 0.1
@@ -740,9 +732,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &4481151669115796356
 MonoBehaviour:
@@ -1127,6 +1119,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8895126821432064786}
     m_Modifications:
+    - target: {fileID: -7596573643949845664, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
+      propertyPath: holder
+      value: 
+      objectReference: {fileID: 237888116187179946}
     - target: {fileID: 4695124145947378411, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1171,10 +1167,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -45
       objectReference: {fileID: 0}
-    - target: {fileID: 4912276960469469345, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
-      propertyPath: holder
-      value: 
-      objectReference: {fileID: 237888116187179946}
     - target: {fileID: 8264033352486348684, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
       propertyPath: m_Name
       value: AK-47
@@ -1189,9 +1181,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4695124145947378411, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
   m_PrefabInstance: {fileID: 6559548374897471385}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2243878522686760760 stripped
+--- !u!114 &5592273346995125497 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4912276960469469345, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
+  m_CorrespondingSourceObject: {fileID: -7596573643949845664, guid: 85588c7487a7b9c4cb59f52161cff0fa, type: 3}
   m_PrefabInstance: {fileID: 6559548374897471385}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

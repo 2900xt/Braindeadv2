@@ -5,26 +5,27 @@ using Unity.Netcode;
 
 public class BulletData : NetworkBehaviour
 {
-    public Vector3 velocity;
     public NetworkVariable<int> damage;
     public NetworkVariable<bool> team;
     public float timer = 2f;
-
-    public override void OnNetworkSpawn()
-    {
-        velocity = new Vector3(0, 0, 0);
-    }
 
     void Update()
     {
         if(IsOwner)
         {
-            transform.position += velocity * Time.deltaTime;
             timer -= Time.deltaTime;
-            if(timer < 0)
+            if(timer < 0 && GetComponent<NetworkObject>().IsSpawned)
             {
-                GetComponent<NetworkObject>().Despawn(true);
+                DestroySelfServerRpc();
             }
+        }
+    }
+
+    public void DestroyBullet()
+    {
+        if(IsOwner && GetComponent<NetworkObject>().IsSpawned)
+        {
+            DestroySelfServerRpc();
         }
     }
 
@@ -38,5 +39,11 @@ public class BulletData : NetworkBehaviour
     public void SetTeamServerRpc(bool newTeam, ServerRpcParams sRpcParams = default)
     {
         team.Value = newTeam;
+    }
+
+    [ServerRpc]
+    public void DestroySelfServerRpc(ServerRpcParams rpcParams = default)
+    {
+        GetComponent<NetworkObject>().Despawn(true);
     }
 }

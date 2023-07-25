@@ -22,8 +22,11 @@ public class WeaponData : NetworkBehaviour
     public float shootTimer = 0, reloadTimer = 0;
 
     public GameObject bulletPrefab;
-    public PlayerData holder;
     public Transform shootpoint;
+    public PlayerControl holder;
+
+    public Sprite gunImage;
+    public float spriteRotation;
     
     public void Reload()
     {
@@ -38,6 +41,7 @@ public class WeaponData : NetworkBehaviour
 
     private void DoneReload()
     {
+        bulletsRemaining += bulletsInMag;
         bulletsInMag = magSize;
         bulletsRemaining -= magSize;
         if(bulletsRemaining < 0)
@@ -67,18 +71,19 @@ public class WeaponData : NetworkBehaviour
         shootTimer = fireRate;
         bulletsInMag--;
 
-        SpawnBullet();
+        SpawnBulletServerRpc();
 
         shooting = true;
     }
 
-    private void SpawnBullet()
+    [ServerRpc]
+    private void SpawnBulletServerRpc(ServerRpcParams rpcParams = default)
     {
         BulletData bullet = Instantiate(bulletPrefab, shootpoint.position, shootpoint.rotation).GetComponent<BulletData>();
         bullet.GetComponent<NetworkObject>().Spawn();
         bullet.SetDamageServerRpc(bulletDamage);
-        bullet.SetTeamServerRpc(holder.team.Value);
-        bullet.velocity = bullet.transform.right * 100f;
+        bullet.SetTeamServerRpc(holder.playerData.Value.team);
+        bullet.gameObject.GetComponent<Rigidbody2D>().velocity = bullet.transform.right * 100f;
         bullet.transform.rotation = Quaternion.Euler(0, 0, bullet.transform.rotation.eulerAngles.z + Random.Range(-(currentRecoil / 2), currentRecoil / 2) + 90f);
     }
 
