@@ -8,6 +8,7 @@ public class WeaponData : NetworkBehaviour
     public int bulletDamage;
 
     public float recoilRate;
+    public float maxRecoil;
     public float currentRecoil = 0;
 
     public float reloadTime;
@@ -27,6 +28,14 @@ public class WeaponData : NetworkBehaviour
 
     public Sprite gunImage;
     public float spriteRotation;
+
+    public AudioSource audioSource;
+    public List<AudioClip> shootingSounds;
+
+    public void Start()
+    {
+        audioSource.volume = PlayerPrefs.GetFloat("SFXVolume");
+    }
     
     public void Reload()
     {
@@ -66,25 +75,34 @@ public class WeaponData : NetworkBehaviour
             return;
         }
 
-        currentRecoil += recoilRate * playerVelocity * Time.deltaTime;
 
         shootTimer = fireRate;
         bulletsInMag--;
 
-        SpawnBulletServerRpc();
+        audioSource.PlayOneShot(shootingSounds[(int)Random.Range(0, shootingSounds.Count)]);
+        SpawnBulletServerRpc(currentRecoil);
 
+        float recoil = recoilRate * Time.deltaTime * (1 + playerVelocity);
+
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            recoil /= 1.5f;
+        }
+
+        currentRecoil += recoil;
+        currentRecoil = Mathf.Min(maxRecoil, currentRecoil);
         shooting = true;
     }
 
     [ServerRpc]
-    private void SpawnBulletServerRpc(ServerRpcParams rpcParams = default)
+    private void SpawnBulletServerRpc(float recoil, ServerRpcParams rpcParams = default)
     {
         BulletData bullet = Instantiate(bulletPrefab, shootpoint.position, shootpoint.rotation).GetComponent<BulletData>();
         bullet.GetComponent<NetworkObject>().Spawn();
         bullet.SetDamageServerRpc(bulletDamage);
         bullet.SetTeamServerRpc(holder.playerData.Value.team);
+        bullet.transform.Rotate(0, 0, Random.Range(-(recoil / 2), recoil / 2));
         bullet.gameObject.GetComponent<Rigidbody2D>().velocity = bullet.transform.right * 100f;
-        bullet.transform.rotation = Quaternion.Euler(0, 0, bullet.transform.rotation.eulerAngles.z + Random.Range(-(currentRecoil / 2), currentRecoil / 2) + 90f);
     }
 
     public void Update()

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4695124145947378411}
   - component: {fileID: 6378155066631880151}
   - component: {fileID: -7596573643949845664}
+  - component: {fileID: 5909410353630080136}
   m_Layer: 0
   m_Name: AK-47
   m_TagString: Untagged
@@ -99,7 +100,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletDamage: 40
-  recoilRate: 0.2
+  recoilRate: 120
+  maxRecoil: 60
   currentRecoil: 0
   reloadTime: 4
   fireRate: 0.2
@@ -110,11 +112,113 @@ MonoBehaviour:
   reloading: 0
   shootTimer: 0
   reloadTimer: 0
-  bulletPrefab: {fileID: 3279414118249024239, guid: 5e73ae7c85608704ab89d3961fdc12e1, type: 3}
+  bulletPrefab: {fileID: 3312406834990729466, guid: 5e73ae7c85608704ab89d3961fdc12e1, type: 3}
   shootpoint: {fileID: 7763342990524188866}
   holder: {fileID: 0}
   gunImage: {fileID: 21300000, guid: aead096d89b9591418cb3b1b9156f75f, type: 3}
   spriteRotation: 45
+  audioSource: {fileID: 5909410353630080136}
+  shootingSounds:
+  - {fileID: 8300000, guid: 80de58fa7edb9b2a28a674a0be610fbf, type: 3}
+  - {fileID: 8300000, guid: 0394d9b712594a41d8cf4852811f8be5, type: 3}
+  - {fileID: 8300000, guid: 637edffc57e60cff49186adf98f9f046, type: 3}
+  - {fileID: 8300000, guid: 9600be4474d74a8b6a5e3c1700fc8296, type: 3}
+--- !u!82 &5909410353630080136
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8264033352486348684}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8651269816785096100
 GameObject:
   m_ObjectHideFlags: 0

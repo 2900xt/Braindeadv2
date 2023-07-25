@@ -28,11 +28,15 @@ public class PlayerControl : NetworkBehaviour
 
     public NetworkVariable<PlayerData> playerData = new NetworkVariable<PlayerData>(new PlayerData());
 
+    public List<AudioClip> footstepsAudio;
+    public AudioSource audioSource;
+
     public override void OnNetworkSpawn()
     {
         isInitialized = false;
         audioListener.enabled = IsOwner;
         playerCamera.Priority = IsOwner ? 1 : 0;
+        audioSource.volume = PlayerPrefs.GetFloat("SFXVolume");
     }
 
     public void UpdatePlayerData()
@@ -57,6 +61,12 @@ public class PlayerControl : NetworkBehaviour
             Input.GetAxisRaw("Horizontal"),
             Input.GetAxisRaw("Vertical")
         );
+
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            inputAcceleration *= 0.5f;
+        }
+
         inputAcceleration *= movementMultiplier * Time.deltaTime;
         rb.velocity += inputAcceleration;
     }
@@ -95,6 +105,15 @@ public class PlayerControl : NetworkBehaviour
         isInitialized = true;
     }
 
+    void PlayFootsteps()
+    {
+        if(audioSource.isPlaying) return;
+
+        AudioClip sound = footstepsAudio[(int)Random.Range(0, footstepsAudio.Count)];
+        audioSource.clip = sound;
+        audioSource.Play();
+    }
+
     void Update()
     {
         if(!isInitialized)
@@ -103,6 +122,11 @@ public class PlayerControl : NetworkBehaviour
         }
 
         UpdatePlayerData();
+
+        if(rb.velocity.magnitude > 12f)
+        {
+            PlayFootsteps();
+        }
 
         if(!IsOwner) return;
 
