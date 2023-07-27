@@ -58,6 +58,8 @@ public class WeaponData : NetworkBehaviour
             bulletsInMag += bulletsRemaining;
         }
 
+        bulletsInMag = (int)Mathf.Max(bulletsInMag, 0f);
+
         reloading = false;
     }
 

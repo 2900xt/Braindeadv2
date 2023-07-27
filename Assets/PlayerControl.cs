@@ -31,6 +31,8 @@ public class PlayerControl : NetworkBehaviour
     public List<AudioClip> footstepsAudio;
     public AudioSource audioSource;
 
+    public PlayerInteraction interaction;
+
     public override void OnNetworkSpawn()
     {
         isInitialized = false;
@@ -109,7 +111,7 @@ public class PlayerControl : NetworkBehaviour
     {
         if(audioSource.isPlaying) return;
 
-        AudioClip sound = footstepsAudio[(int)Random.Range(0, footstepsAudio.Count)];
+        AudioClip sound = footstepsAudio[Random.Range(0, footstepsAudio.Count)];
         audioSource.clip = sound;
         audioSource.Play();
     }
@@ -123,7 +125,7 @@ public class PlayerControl : NetworkBehaviour
 
         UpdatePlayerData();
 
-        if(rb.velocity.magnitude > 12f)
+        if(rb.velocity.magnitude >= 12f)
         {
             PlayFootsteps();
         }
@@ -168,14 +170,37 @@ public class PlayerControl : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if(!collider.gameObject.CompareTag("Bullet")) return;
-
-        BulletData data = collider.gameObject.GetComponent<BulletData>();
-        if(data.team.Value != this.playerData.Value.team && IsOwner)
+        if(collider.gameObject.CompareTag("Bullet"))
         {
-            TakeDamageServerRpc(data.damage.Value);
-        }
+            BulletData data = collider.gameObject.GetComponent<BulletData>();
+            if(data.team.Value != this.playerData.Value.team && IsOwner)
+            {
+                TakeDamageServerRpc(data.damage.Value);
+            }
 
-        data.DestroyBullet();
+            data.DestroyBullet();
+        }
+    }
+    
+    private void OnTriggerStay2D(Collider2D other) {
+        if(other.gameObject.CompareTag("Interaction") && IsOwner)
+        {
+            PlayerInteraction newInter = other.gameObject.GetComponent<PlayerInteraction>();
+            if(interaction == null || newInter.priority > interaction.priority)
+            {
+                interaction = newInter;
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other) {
+        if(other.gameObject.CompareTag("Interaction") && IsOwner)
+        {
+            PlayerInteraction newInter = other.gameObject.GetComponent<PlayerInteraction>();
+            if(interaction == newInter)
+            {
+                interaction = null;
+            }
+        }
     }
 }

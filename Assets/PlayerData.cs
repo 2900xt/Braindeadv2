@@ -6,19 +6,20 @@ using Unity.Collections;
 
 public class PlayerData : INetworkSerializable
 {
+    public bool alive;
     public bool team;
     public int hp;
     public int armor;
     public int credits;
     public int kills;
     public FixedString32Bytes username;
-
     public PlayerData()
     {
         team = true;
-        hp = 100;
+        alive = false;
+        hp = 0;
         armor = 0;
-        credits= 800;
+        credits= 0;
         kills = 0;
         username = new FixedString32Bytes();
     }
@@ -30,5 +31,15 @@ public class PlayerData : INetworkSerializable
         serializer.SerializeValue(ref armor);
         serializer.SerializeValue(ref credits);
         serializer.SerializeValue(ref username);
+        serializer.SerializeValue(ref alive);
+    }
+
+    public override string ToString()
+    {
+        return 
+        "Team: " + (team ? "TPlayer" : "CTPlayer") + '\n' + 
+        ("IGN: " + username.ToString()) + '\n' +
+        ("HP: " + hp + "\tArmor: " + armor) +'\n' +
+        ("$: " + credits +  "\tKills:  " + kills);
     }
 }
