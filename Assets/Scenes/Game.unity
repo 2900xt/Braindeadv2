@@ -2122,6 +2122,7 @@ MonoBehaviour:
   prefabList:
   - {fileID: 7668711626103148305, guid: 213e0508dc4ba6f01b4b2659eba2499c, type: 3}
   - {fileID: 2272944474334694840, guid: b94587918fc108493bcbd9b20101dddb, type: 3}
+  bombPrefab: {fileID: 8126478310473829735, guid: 0998945af242108b6af449dcbc717782, type: 3}
   TSpawn:
     m_InternalValue: {x: 0, y: 0, z: 0}
   CTSpawn:
@@ -3216,6 +3217,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0892bb1a3380fc11fb092b6a282ab5ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldGen: {fileID: 813951975}
+  resetting: 0
 --- !u!114 &1578544812
 MonoBehaviour:
   m_ObjectHideFlags: 0

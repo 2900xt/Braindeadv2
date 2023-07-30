@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 public class BombData : INetworkSerializable
 {
-    public readonly float explosionTime, defuseTime, plantTime;
+    public static readonly float explosionTime = 40f, defuseTime = 7f, plantTime = 5f;
     public float plantTimer, defuseTimer, explosionTimer;
     public enum BombState
     {
@@ -15,6 +15,7 @@ public class BombData : INetworkSerializable
         PLANTED,
         DEFUSING,
         DEFUSED,
+        EXPLODED
     };
     public BombState state;
     public PlayerData carrier;
@@ -55,12 +56,17 @@ public class BombData : INetworkSerializable
             case BombState.DEFUSED:
                 stateString = "Defused";
                 break;
+            case BombState.EXPLODED:
+                stateString = "Exploded";
+                break;
         }
+
+        string carrierString = (carrier == null) ? "N/A" : carrier.username.ToString();
 
         return 
         "State: " + stateString + '\n' +
         "Timer: " + timerString + '\n' +
-        "Carrier:  " + carrier.username.ToString() + '\n' +
+        "Carrier:  " + carrierString + '\n' +
         "Position: " + position.ToString();
     }
 }

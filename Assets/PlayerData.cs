@@ -12,16 +12,20 @@ public class PlayerData : INetworkSerializable
     public int armor;
     public int credits;
     public int kills;
+    public bool hasBomb;
     public FixedString32Bytes username;
+    public ulong clientID;
     public PlayerData()
     {
         team = true;
         alive = false;
-        hp = 0;
+        hp = 100;
         armor = 0;
-        credits= 0;
+        credits= 800;
         kills = 0;
         username = new FixedString32Bytes();
+        hasBomb = false;
+        clientID = 0;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -32,6 +36,8 @@ public class PlayerData : INetworkSerializable
         serializer.SerializeValue(ref credits);
         serializer.SerializeValue(ref username);
         serializer.SerializeValue(ref alive);
+        serializer.SerializeValue(ref hasBomb);
+        serializer.SerializeValue(ref clientID);
     }
 
     public override string ToString()
@@ -40,6 +46,7 @@ public class PlayerData : INetworkSerializable
         "Team: " + (team ? "TPlayer" : "CTPlayer") + '\n' + 
         ("IGN: " + username.ToString()) + '\n' +
         ("HP: " + hp + "\tArmor: " + armor) +'\n' +
-        ("$: " + credits +  "\tKills:  " + kills);
+        ("$: " + credits +  "\tKills:  " + kills) + '\n' +
+        "Bomb: " + hasBomb;
     }
 }

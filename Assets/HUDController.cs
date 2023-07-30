@@ -79,7 +79,11 @@ public class HUDController : NetworkBehaviour
             
             int min = (int)(gameInfo.secondsInRound / 60);
             int sec = (int)(gameInfo.secondsInRound % 60);
-            timeRemainingText.text = min + ":" + sec;
+
+            if(sec >= 10)
+                timeRemainingText.text = min + ":" + sec;
+            else 
+                timeRemainingText.text = min + ":0" + sec;
 
             if(min == 0 && sec < 15)
             {

@@ -50,26 +50,28 @@ public class GameData : INetworkSerializable
         serializer.SerializeValue(ref bomb);
     }
 
-    public void PrintDebugInfo()
+    public string GetDebugInfo()
     {
-        Debug.Log(
+        string info =
             "TAlive: " + TAlive + '\n' +
             "CTAlive: " + CTAlive + '\n' +
             "TScore: " + TScore + '\n' +
             "CTScore: " + CTScore + '\n' +
             "Round#: " + roundNumber + '\n' +
             "SecondsInRound: " + secondsInRound + '\n' +
-            "Bomb: {\n\n" + bomb.ToString() + "\n\n}\n" + "Players: \n\n"
-        );
+            "Bomb: {\n\n" + bomb.ToString() + "\n\n}\n" + "Players: \n\n";
+        
 
         for(int i = 0; i < TPlayers.Count; i++)
         {
-            Debug.Log(TPlayers[i] + "\n\n");
+            info += TPlayers[i] + "\n\n";
         }
 
         for(int i = 0; i < CTPlayers.Count; i++)
         {
-            Debug.Log(CTPlayers[i] + "\n\n");
+            info += CTPlayers[i] + "\n\n";
         }
+
+        return info;
     }
 }

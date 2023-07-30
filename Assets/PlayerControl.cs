@@ -10,28 +10,22 @@ public class PlayerControl : NetworkBehaviour
 {
     public static float movementMultiplier = 25f;
     public Rigidbody2D rb;
-
-    /* True if player is on T side */
     public SpriteRenderer spriteRenderer;
     public Sprite tSprite, ctSprite;
     public GameObject lightCaster;
-
     public TextMeshPro playerUsernameField;
     public NetworkVariable<FixedString32Bytes> username;
-    
     public CinemachineVirtualCamera playerCamera;
     public AudioListener audioListener;
-
     public WeaponData weapon;
-
     private bool isInitialized;
-
     public NetworkVariable<PlayerData> playerData = new NetworkVariable<PlayerData>(new PlayerData());
-
     public List<AudioClip> footstepsAudio;
     public AudioSource audioSource;
-
     public PlayerInteraction interaction;
+    public bool hasBomb;
+    public GameManager gameMgr;
+    public WorldGenerator worldGen;
 
     public override void OnNetworkSpawn()
     {
@@ -39,6 +33,9 @@ public class PlayerControl : NetworkBehaviour
         audioListener.enabled = IsOwner;
         playerCamera.Priority = IsOwner ? 1 : 0;
         audioSource.volume = PlayerPrefs.GetFloat("SFXVolume");
+        gameMgr = GameObject.Find("GameManager").GetComponent<GameManager>();
+        worldGen = GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>();
+        playerData.Value.clientID = NetworkManager.Singleton.LocalClientId;
     }
 
     public void UpdatePlayerData()
@@ -105,6 +102,7 @@ public class PlayerControl : NetworkBehaviour
         }
         UpdatePlayerData();
         isInitialized = true;
+        gameMgr.RegisterPlayerServerRpc();
     }
 
     void PlayFootsteps()
@@ -143,6 +141,37 @@ public class PlayerControl : NetworkBehaviour
         if(Input.GetKeyDown(KeyCode.R))
         {
             weapon.Reload();
+        }
+
+        if (
+            gameMgr.gameInfo.Value.bomb.state == BombData.BombState.PLANTED &&
+            !playerData.Value.team && Input.GetKey(KeyCode.E) &&
+            Vector3.Distance(transform.position, gameMgr.gameInfo.Value.bomb.position) < 10f
+            )
+        {
+            gameMgr.StartDefuseServerRpc();
+        }
+
+        if(!hasBomb) return;
+
+
+        if(!playerData.Value.team) return;
+
+        if(rb.velocity.magnitude > 1f && gameMgr.gameInfo.Value.bomb.state == BombData.BombState.PLANTING)
+        {
+            gameMgr.CancelPlantServerRpc();
+        }
+
+        else if(
+            Input.GetKey(KeyCode.E) &&
+            gameMgr.gameInfo.Value.bomb.state == BombData.BombState.CARRIED &&
+            (
+                Vector3.Distance(transform.position, worldGen.ASite.Value) < 10f ||
+                Vector3.Distance(transform.position, worldGen.BSite.Value) < 10f 
+            )
+        )
+        {
+            gameMgr.StartPlantServerRpc();
         }
     }
 
