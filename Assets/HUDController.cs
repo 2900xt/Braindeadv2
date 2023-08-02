@@ -20,6 +20,8 @@ public class HUDController : NetworkBehaviour
     public List<Image> TAliveImages, CTAliveImages;
     void Update()
     {
+        if(NetworkManager.LocalClient.PlayerObject == null) return;
+        
         GameObject player = NetworkManager.LocalClient.PlayerObject.gameObject;
         playerData = player.GetComponent<PlayerControl>().playerData.Value;
         weaponData = player.GetComponent<PlayerControl>().weapon;

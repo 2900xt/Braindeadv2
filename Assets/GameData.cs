@@ -5,12 +5,12 @@ using Unity.Netcode;
 
 public class GameData : INetworkSerializable
 {
-    public List<PlayerData> TPlayers, CTPlayers;
+    public List<PlayerData> TPlayers = new List<PlayerData>(), CTPlayers = new List<PlayerData>();
     public int TAlive, CTAlive;
     public int TScore, CTScore;
     public int roundNumber;
     public float secondsInRound;
-    public BombData bomb;
+    public BombData bomb = new BombData();
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter 
     {
         int length = 0;
@@ -23,22 +23,24 @@ public class GameData : INetworkSerializable
         
         for(int i = 0; i < length; i++)
         {
+            Debug.Log("Ind:" + i);
             serializer.SerializeValue(ref Array[i]);
         }
 
         length = 0;
+        serializer.SerializeValue(ref length);
         Array = CTPlayers.ToArray();
         if(!serializer.IsReader)
         {
             length = Array.Length;
+            for(int i = 0; i < length; i++)
+            {
+                serializer.SerializeValue(ref Array[i]);
+            }
+        } else {
         }
-        serializer.SerializeValue(ref length);
         
-        for(int i = 0; i < length; i++)
-        {
-            serializer.SerializeValue(ref Array[i]);
-        }
-
+        
         serializer.SerializeValue(ref TAlive);
         serializer.SerializeValue(ref CTAlive);
         serializer.SerializeValue(ref TScore);

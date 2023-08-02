@@ -18,11 +18,16 @@ public class BombData : INetworkSerializable
         EXPLODED
     };
     public BombState state;
+    public bool hasCarrier;
     public PlayerData carrier;
-    public Vector2 position;
+    public Vector2 position = Vector3.zero;
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter 
     {
-        serializer.SerializeValue(ref carrier);
+        serializer.SerializeValue(ref hasCarrier);
+        if(hasCarrier)
+        {
+            serializer.SerializeValue(ref carrier);
+        }
         serializer.SerializeValue(ref state);
         serializer.SerializeValue(ref position);
         serializer.SerializeValue(ref plantTimer);

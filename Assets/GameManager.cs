@@ -5,14 +5,13 @@ using Unity.Netcode;
 
 public class GameManager : NetworkBehaviour
 {
-    public NetworkVariable<GameData> gameInfo;
+    public NetworkVariable<GameData> gameInfo = new NetworkVariable<GameData>(new GameData());
     public WorldGenerator worldGen;
     public bool resetting = false;
     public override void OnNetworkSpawn()
     {
         if(!NetworkManager.Singleton.IsServer) return;
 
-        gameInfo = new NetworkVariable<GameData>(new GameData());
         gameInfo.Value.TPlayers = new List<PlayerData>();
         gameInfo.Value.CTPlayers = new List<PlayerData>();
         gameInfo.Value.TAlive = 0;
@@ -22,6 +21,7 @@ public class GameManager : NetworkBehaviour
         gameInfo.Value.roundNumber = 1;
         gameInfo.Value.secondsInRound = 100;
         gameInfo.Value.bomb = new BombData();
+        gameInfo.Value.bomb.position = Vector3.zero;
         gameInfo.Value.bomb.state = BombData.BombState.DROPPED;
     }
 
@@ -151,19 +151,39 @@ public class GameManager : NetworkBehaviour
     {
         ulong clientID = rpcParams.Receive.SenderClientId;
         GameObject player = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
-        PlayerData playerData = player.GetComponent<PlayerControl>().playerData.Value;
+        PlayerControl playerControl = player.GetComponent<PlayerControl>();
 
-        playerData.clientID = clientID;
+        playerControl.playerData.Value.clientID = clientID;
+        
+        if(playerControl.playerData.Value.team)
+        {
+            gameInfo.Value.TPlayers.Add(playerControl.playerData.Value);
+            gameInfo.Value.TAlive++;
+        } 
+        else 
+        {
+            gameInfo.Value.CTPlayers.Add(playerControl.playerData.Value);
+            gameInfo.Value.CTAlive++;
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void PlayerDieServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ulong clientID = rpcParams.Receive.SenderClientId;
+        GameObject player = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
+        PlayerData playerData = player.GetComponent<PlayerControl>().playerData.Value;
         
         if(playerData.team)
         {
-            gameInfo.Value.TPlayers.Add(playerData);
-            gameInfo.Value.TAlive++;
-        } else 
+            gameInfo.Value.TAlive--;
+        } 
+        else
         {
-            gameInfo.Value.CTPlayers.Add(playerData);
-            gameInfo.Value.CTAlive++;
+            gameInfo.Value.CTAlive--;
         }
+
+        player.SetActive(false);
     }
 
     void Update()

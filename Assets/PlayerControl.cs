@@ -33,8 +33,6 @@ public class PlayerControl : NetworkBehaviour
         audioListener.enabled = IsOwner;
         playerCamera.Priority = IsOwner ? 1 : 0;
         audioSource.volume = PlayerPrefs.GetFloat("SFXVolume");
-        gameMgr = GameObject.Find("GameManager").GetComponent<GameManager>();
-        worldGen = GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>();
         playerData.Value.clientID = NetworkManager.Singleton.LocalClientId;
     }
 
@@ -88,21 +86,16 @@ public class PlayerControl : NetworkBehaviour
     {
         if(IsOwner)
         {
+            gameMgr = GameObject.Find("GameManager").GetComponent<GameManager>();
+            worldGen = GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>();
             bool newTeam = Random.Range(0f, 1f) > 0.5f;
             RequestTeamSwitchServerRpc(newTeam);
-            if(NetworkManager.Singleton.IsClient)
-            {
-                transform.position = newTeam ?
-                    GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().TSpawn.Value :
-                    GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().CTSpawn.Value;
-            }
-
             playerUsernameField.text = PlayerPrefs.GetString("Username");
             RequestUsernameChangeServerRpc(playerUsernameField.text);
+            gameMgr.RegisterPlayerServerRpc();
         }
         UpdatePlayerData();
         isInitialized = true;
-        gameMgr.RegisterPlayerServerRpc();
     }
 
     void PlayFootsteps()
@@ -142,7 +135,13 @@ public class PlayerControl : NetworkBehaviour
         {
             weapon.Reload();
         }
-
+        
+        if(playerData.Value.hp <= 0 && playerData.Value.alive)
+        {
+            playerData.Value.alive = false;
+            gameMgr.PlayerDieServerRpc();
+        }
+        
         if (
             gameMgr.gameInfo.Value.bomb.state == BombData.BombState.PLANTED &&
             !playerData.Value.team && Input.GetKey(KeyCode.E) &&
@@ -153,7 +152,6 @@ public class PlayerControl : NetworkBehaviour
         }
 
         if(!hasBomb) return;
-
 
         if(!playerData.Value.team) return;
 
@@ -179,34 +177,45 @@ public class PlayerControl : NetworkBehaviour
     [ServerRpc]
     public void RequestUsernameChangeServerRpc(string newUsername, ServerRpcParams rpcParams = default)
     {
-        playerData.Value.username = new FixedString32Bytes(newUsername);
+        ulong clientID = rpcParams.Receive.SenderClientId;
+        GameObject player = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
+        PlayerControl playerControl = player.GetComponent<PlayerControl>();
+        playerControl.playerData.Value.username = new FixedString32Bytes(newUsername);
     }
 
     [ServerRpc]
     public void RequestTeamSwitchServerRpc(bool newTeam, ServerRpcParams rpcParams = default)
     {
-        transform.position = newTeam ?
+        ulong clientID = rpcParams.Receive.SenderClientId;
+        GameObject player = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
+        PlayerControl playerControl = player.GetComponent<PlayerControl>();
+
+        player.transform.position = newTeam ?
             GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().TSpawn.Value :
             GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().CTSpawn.Value;
-        playerData.Value.team = newTeam;
+        playerControl.playerData.Value.team = newTeam;
     }
 
     [ServerRpc]
     public void TakeDamageServerRpc(int dmg, ServerRpcParams rpcParams = default)
     {
-        playerData.Value.hp -= dmg;
+        ulong clientID = rpcParams.Receive.SenderClientId;
+        GameObject player = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
+        PlayerControl playerControl = player.GetComponent<PlayerControl>();
+        
+        playerControl.playerData.Value.hp -= dmg;
+        
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if(collider.gameObject.CompareTag("Bullet"))
+        if(collider.gameObject.CompareTag("Bullet") && IsOwner)
         {
             BulletData data = collider.gameObject.GetComponent<BulletData>();
-            if(data.team.Value != this.playerData.Value.team && IsOwner)
+            if((data.team.Value != playerData.Value.team))
             {
                 TakeDamageServerRpc(data.damage.Value);
             }
-
             data.DestroyBullet();
         }
     }
