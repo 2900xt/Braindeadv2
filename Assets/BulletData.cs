@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class BulletData : NetworkBehaviour
 {
     public NetworkVariable<int> damage;
-    public NetworkVariable<bool> team;
+    public NetworkVariable<ulong> shooterID;
     public float timer = 2f;
 
     void Update()
@@ -36,9 +36,9 @@ public class BulletData : NetworkBehaviour
     }
     
     [ServerRpc]
-    public void SetTeamServerRpc(bool newTeam, ServerRpcParams sRpcParams = default)
+    public void SetShooterServerRpc(ulong shooterID, ServerRpcParams sRpcParams = default)
     {
-        team.Value = newTeam;
+        this.shooterID.Value = shooterID;
     }
 
     [ServerRpc]

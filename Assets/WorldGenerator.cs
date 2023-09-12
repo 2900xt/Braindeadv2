@@ -13,14 +13,14 @@ public class WorldGenerator : NetworkBehaviour
 
     public static int worldWidth = 48, worldLength = 48;
 
-    public static readonly string mapFilePath = "/home/taha/Downloads/braindead-default.map";
+    public static string mapFilePath = "C:\\Users\\tahak\\OneDrive\\Documents\\Braindeadv2\\Assets\\Maps\\braindead-default.map";
 
-    public static NetworkVariable<bool> worldGenerated = new NetworkVariable<bool>(false);
-    public NetworkVariable<Vector3> TSpawn = new NetworkVariable<Vector3>(), CTSpawn = new NetworkVariable<Vector3>();
-    public NetworkVariable<Vector3> ASite = new NetworkVariable<Vector3>(), BSite = new NetworkVariable<Vector3>();
+    public static NetworkVariable<bool> worldGenerated = new(false);
+    public NetworkVariable<Vector3> TSpawn = new(), CTSpawn = new();
+    public NetworkVariable<Vector3> ASite = new(), BSite = new();
     
     public override void OnNetworkSpawn()
-    {
+    { 
         /* Only spawn the world if server */
         if(!NetworkManager.Singleton.IsServer || worldGenerated.Value)
         {
@@ -50,16 +50,16 @@ public class WorldGenerator : NetworkBehaviour
         switch(segmentCode)
         {
             case 't':
-                TSpawn.Value = new Vector3(x, y, 0);
+                TSpawn.Value = new(x, y, 0);
                 break;
             case 'c':
-                CTSpawn.Value = new Vector3(x, y, 0);
+                CTSpawn.Value = new(x, y, 0);
                 break;
             case 'a':
-                ASite.Value = new Vector3(x, y, 0);
+                ASite.Value = new(x, y, 0);
                 break;
             case 'b':
-                BSite.Value = new Vector3(x, y, 0);
+                BSite.Value = new(x, y, 0);
                 break;
             case '0':
                 return;

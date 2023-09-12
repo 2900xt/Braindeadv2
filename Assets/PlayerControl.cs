@@ -90,6 +90,11 @@ public class PlayerControl : NetworkBehaviour
             worldGen = GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>();
             bool newTeam = Random.Range(0f, 1f) > 0.5f;
             RequestTeamSwitchServerRpc(newTeam);
+
+            transform.position = newTeam ?
+                GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().TSpawn.Value :
+                GameObject.Find("WorldGenerator").GetComponent<WorldGenerator>().CTSpawn.Value;
+
             playerUsernameField.text = PlayerPrefs.GetString("Username");
             RequestUsernameChangeServerRpc(playerUsernameField.text);
             gameMgr.RegisterPlayerServerRpc();
@@ -134,12 +139,6 @@ public class PlayerControl : NetworkBehaviour
         if(Input.GetKeyDown(KeyCode.R))
         {
             weapon.Reload();
-        }
-        
-        if(playerData.Value.hp <= 0 && playerData.Value.alive)
-        {
-            playerData.Value.alive = false;
-            gameMgr.PlayerDieServerRpc();
         }
         
         if (
@@ -207,17 +206,46 @@ public class PlayerControl : NetworkBehaviour
         
     }
 
+    [ServerRpc]
+    public void HandleBulletCollisionServerRpc(int dmg , ulong shooterID ,ServerRpcParams rpcParams = default)
+    {
+        ulong clientID = rpcParams.Receive.SenderClientId;
+        GameObject shooterObject = NetworkManager.ConnectedClients[shooterID].PlayerObject.gameObject;
+        PlayerControl shooter = shooterObject.GetComponent<PlayerControl>();
+
+        GameObject playerObject = NetworkManager.ConnectedClients[clientID].PlayerObject.gameObject;
+        PlayerControl player = playerObject.GetComponent<PlayerControl>();
+        
+        if(player.playerData.Value.team == shooter.playerData.Value.team)
+        {
+            return;
+        }
+
+        TakeDamageServerRpc(dmg); 
+        
+        if (player.playerData.Value.hp <= 0 && player.playerData.Value.alive)
+        {
+            player.playerData.Value.alive = false;
+            gameMgr.PlayerDieServerRpc(rpcParams);
+            gameObject.SetActive(false);
+
+            shooter.playerData.Value.kills++;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if(collider.gameObject.CompareTag("Bullet") && IsOwner)
+        if(!(collider.gameObject.CompareTag("Bullet") && IsOwner))
         {
-            BulletData data = collider.gameObject.GetComponent<BulletData>();
-            if((data.team.Value != playerData.Value.team))
-            {
-                TakeDamageServerRpc(data.damage.Value);
-            }
-            data.DestroyBullet();
+            return;
         }
+
+        BulletData data = collider.gameObject.GetComponent<BulletData>();
+
+        data.DestroyBullet();
+
+        
+
     }
     
     private void OnTriggerStay2D(Collider2D other) {

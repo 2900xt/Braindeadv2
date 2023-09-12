@@ -102,7 +102,7 @@ public class WeaponData : NetworkBehaviour
         BulletData bullet = Instantiate(bulletPrefab, shootpoint.position, shootpoint.rotation).GetComponent<BulletData>();
         bullet.GetComponent<NetworkObject>().Spawn();
         bullet.SetDamageServerRpc(bulletDamage);
-        bullet.SetTeamServerRpc(holder.playerData.Value.team);
+        bullet.SetShooterServerRpc(holder.playerData.Value.clientID);
         bullet.transform.Rotate(0, 0, Random.Range(-(recoil / 2), recoil / 2));
         bullet.gameObject.GetComponent<Rigidbody2D>().velocity = bullet.transform.right * 100f;
     }

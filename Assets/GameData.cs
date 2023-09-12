@@ -5,50 +5,43 @@ using Unity.Netcode;
 
 public class GameData : INetworkSerializable
 {
-    public List<PlayerData> TPlayers = new List<PlayerData>(), CTPlayers = new List<PlayerData>();
+    public PlayerData[] TPlayers = new PlayerData[5], CTPlayers = new PlayerData[5];
+
+    public int numT, numCT;
     public int TAlive, CTAlive;
     public int TScore, CTScore;
     public int roundNumber;
     public float secondsInRound;
-    public BombData bomb = new BombData();
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter 
+    public BombData bomb = new();
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        int length = 0;
-        PlayerData[] Array = TPlayers.ToArray();
-        if(!serializer.IsReader)
+        serializer.SerializeValue(ref numT);
+        serializer.SerializeValue(ref numCT);
+
+        for (int i = 0; i < numT; i++)
         {
-            length = Array.Length;
-        }
-        serializer.SerializeValue(ref length);
-        
-        for(int i = 0; i < length; i++)
-        {
-            Debug.Log("Ind:" + i);
-            serializer.SerializeValue(ref Array[i]);
+            if (serializer.IsReader && TPlayers[i] == null)
+            {
+                TPlayers[i] = new PlayerData();
+            }
+            serializer.SerializeValue(ref TPlayers[i]);
         }
 
-        length = 0;
-        serializer.SerializeValue(ref length);
-        Array = CTPlayers.ToArray();
-        if(!serializer.IsReader)
+        for (int i = 0; i < numCT; i++)
         {
-            length = Array.Length;
-            for(int i = 0; i < length; i++)
+            if(serializer.IsReader && CTPlayers[i] == null)
             {
-                serializer.SerializeValue(ref Array[i]);
+                CTPlayers[i] = new PlayerData();
             }
-        } else {
+            serializer.SerializeValue(ref CTPlayers[i]);
         }
-        
-        
+
         serializer.SerializeValue(ref TAlive);
         serializer.SerializeValue(ref CTAlive);
         serializer.SerializeValue(ref TScore);
         serializer.SerializeValue(ref CTScore);
-
         serializer.SerializeValue(ref roundNumber);
         serializer.SerializeValue(ref secondsInRound);
-
         serializer.SerializeValue(ref bomb);
     }
 
@@ -64,12 +57,12 @@ public class GameData : INetworkSerializable
             "Bomb: {\n\n" + bomb.ToString() + "\n\n}\n" + "Players: \n\n";
         
 
-        for(int i = 0; i < TPlayers.Count; i++)
+        for(int i = 0; i < numT; i++)
         {
             info += TPlayers[i] + "\n\n";
         }
 
-        for(int i = 0; i < CTPlayers.Count; i++)
+        for(int i = 0; i < numCT; i++)
         {
             info += CTPlayers[i] + "\n\n";
         }

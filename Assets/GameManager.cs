@@ -12,15 +12,12 @@ public class GameManager : NetworkBehaviour
     {
         if(!NetworkManager.Singleton.IsServer) return;
 
-        gameInfo.Value.TPlayers = new List<PlayerData>();
-        gameInfo.Value.CTPlayers = new List<PlayerData>();
         gameInfo.Value.TAlive = 0;
         gameInfo.Value.CTAlive = 0;
         gameInfo.Value.TScore = 0;
         gameInfo.Value.CTScore = 0;
         gameInfo.Value.roundNumber = 1;
         gameInfo.Value.secondsInRound = 100;
-        gameInfo.Value.bomb = new BombData();
         gameInfo.Value.bomb.position = Vector3.zero;
         gameInfo.Value.bomb.state = BombData.BombState.DROPPED;
     }
@@ -32,10 +29,12 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("Bomb").transform.position = worldGen.TSpawn.Value;
         gameInfo.Value.roundNumber++;
         gameInfo.Value.secondsInRound = 100;
-        gameInfo.Value.bomb = new BombData();
-        gameInfo.Value.bomb.state = BombData.BombState.DROPPED;
+        gameInfo.Value.bomb = new BombData
+        {
+            state = BombData.BombState.DROPPED
+        };
 
-        if(winningTeam)
+        if (winningTeam)
         {
             gameInfo.Value.TScore++;
         } else 
@@ -43,10 +42,10 @@ public class GameManager : NetworkBehaviour
             gameInfo.Value.CTScore++;
         }
 
-        gameInfo.Value.TAlive = gameInfo.Value.TPlayers.Count;
-        gameInfo.Value.CTAlive = gameInfo.Value.CTPlayers.Count;
+        gameInfo.Value.TAlive = gameInfo.Value.numT;
+        gameInfo.Value.CTAlive = gameInfo.Value.numCT;
 
-        for(int i = 0; i < gameInfo.Value.TPlayers.Count; i++)
+        for(int i = 0; i < gameInfo.Value.numT; i++)
         {
             gameInfo.Value.TPlayers[i].alive = true;
             gameInfo.Value.TPlayers[i].hp = 100;
@@ -58,7 +57,7 @@ public class GameManager : NetworkBehaviour
             player.transform.position = worldGen.TSpawn.Value;
         }
 
-        for(int i = 0; i < gameInfo.Value.CTPlayers.Count; i++)
+        for(int i = 0; i < gameInfo.Value.numCT; i++)
         {
             gameInfo.Value.CTPlayers[i].alive = true;
             gameInfo.Value.CTPlayers[i].hp = 100;
@@ -120,6 +119,8 @@ public class GameManager : NetworkBehaviour
         gameInfo.Value.bomb.state = BombData.BombState.CARRIED;
         gameInfo.Value.bomb.plantTimer = BombData.plantTime;
         gameInfo.Value.bomb.position = Vector2.zero;
+
+        gameInfo.SetDirty(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -130,6 +131,8 @@ public class GameManager : NetworkBehaviour
         gameInfo.Value.bomb.position = plantPos;
         gameInfo.Value.bomb.state = BombData.BombState.PLANTING;
         gameInfo.Value.bomb.plantTimer = BombData.plantTime;
+
+        gameInfo.SetDirty(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -137,6 +140,8 @@ public class GameManager : NetworkBehaviour
     {
         gameInfo.Value.bomb.state = BombData.BombState.DEFUSING;
         gameInfo.Value.bomb.defuseTimer = BombData.defuseTime;
+
+        gameInfo.SetDirty(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -144,6 +149,8 @@ public class GameManager : NetworkBehaviour
     {
         gameInfo.Value.bomb.state = BombData.BombState.PLANTED;
         gameInfo.Value.bomb.defuseTimer = BombData.defuseTime;
+
+        gameInfo.SetDirty(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -157,14 +164,16 @@ public class GameManager : NetworkBehaviour
         
         if(playerControl.playerData.Value.team)
         {
-            gameInfo.Value.TPlayers.Add(playerControl.playerData.Value);
+            gameInfo.Value.TPlayers[gameInfo.Value.numT++] = playerControl.playerData.Value;
             gameInfo.Value.TAlive++;
         } 
-        else 
+        else
         {
-            gameInfo.Value.CTPlayers.Add(playerControl.playerData.Value);
+            gameInfo.Value.CTPlayers[gameInfo.Value.numCT++] = playerControl.playerData.Value;
             gameInfo.Value.CTAlive++;
         }
+
+        gameInfo.SetDirty(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -183,6 +192,7 @@ public class GameManager : NetworkBehaviour
             gameInfo.Value.CTAlive--;
         }
 
+        gameInfo.SetDirty(true);
         player.SetActive(false);
     }
 
@@ -216,6 +226,7 @@ public class GameManager : NetworkBehaviour
         }
 
         UpdateBomb();
+        gameInfo.SetDirty(true);
     }
 
     void TWin()
